@@ -25,10 +25,44 @@ module.exports = async function handler(req, res) {
       return str;
     }
 
-    // Sayı — Türkçe ondalık (virgül → nokta)
+    // Akıllı sayı parse:
+    // "4,01"   → 4.01   (Türkçe ondalık)
+    // "1.133"  → 1133   (binlik ayraç)
+    // "1,133"  → 1133   (binlik ayraç Türkçe)
+    // "1133"   → 1133   (düz sayı)
     function parseNum(str) {
       if (!str || str === '') return null;
-      return parseFloat(str.replace(',', '.'));
+      str = str.trim();
+
+      // Hem nokta hem virgül var
+      if (str.includes('.') && str.includes(',')) {
+        // "1.133,45" → nokta binlik, virgül ondalık
+        return parseFloat(str.replace(/\./g, '').replace(',', '.'));
+      }
+
+      // Sadece virgül var
+      if (str.includes(',')) {
+        const parts = str.split(',');
+        // Virgülden sonra 1-2 basamak → ondalık (4,01 veya 4,1)
+        if (parts[1] && parts[1].length <= 2) {
+          return parseFloat(str.replace(',', '.'));
+        }
+        // Virgülden sonra 3 basamak → binlik ayraç (1,133)
+        return parseFloat(str.replace(',', ''));
+      }
+
+      // Sadece nokta var
+      if (str.includes('.')) {
+        const parts = str.split('.');
+        // Noktadan sonra 3 basamak → binlik ayraç (1.133)
+        if (parts[1] && parts[1].length === 3) {
+          return parseFloat(str.replace('.', ''));
+        }
+        // Noktadan sonra 1-2 basamak → ondalık
+        return parseFloat(str);
+      }
+
+      return parseFloat(str);
     }
 
     function calcChange(price, prevPrice) {
@@ -41,19 +75,19 @@ module.exports = async function handler(req, res) {
       };
     }
 
-    // LCO — $/varil, direkt kullan
+    // LCO — $/varil
     const lcoPrice = parseNum(latest[1]);
     const lcoPrev  = parseNum(prev[1]);
 
     // NYF (Kalorifer Yakıtı) — $/galon → $/ton
-    // Fuel oil: 1 ton ≈ 264 galon
+    // Fuel oil yoğunluğu: 1 ton ≈ 264 galon (0.86 kg/litre)
     const NYF_CONV = 264;
     const nyfRaw   = parseNum(latest[2]);
     const nyfPrev  = parseNum(prev[2]);
     const nyfPrice = nyfRaw  ? parseFloat((nyfRaw  * NYF_CONV).toFixed(1)) : null;
     const nyfPrevP = nyfPrev ? parseFloat((nyfPrev * NYF_CONV).toFixed(1)) : null;
 
-    // LGO (Gas Oil) — zaten $/ton, dönüşüm yok
+    // LGO (Gas Oil) — $/ton, direkt
     const lgoPrice = parseNum(latest[3]);
     const lgoPrev  = parseNum(prev[3]);
 
@@ -70,9 +104,9 @@ module.exports = async function handler(req, res) {
       updatedAt: new Date().toISOString(),
       latest: {
         date: parseDate(latest[0]),
-        LCO: { price: lcoPrice,  ...calcChange(lcoPrice,  lcoPrev),  unit: '$/varil', label: 'Brent Ham Petrol'      },
-        NYF: { price: nyfPrice,  ...calcChange(nyfPrice,  nyfPrevP), unit: '$/ton',   label: 'Kalorifer Yakıtı NWE'  },
-        LGO: { price: lgoPrice,  ...calcChange(lgoPrice,  lgoPrev),  unit: '$/ton',   label: 'Gas Oil (LGO)'         },
+        LCO: { price: lcoPrice, ...calcChange(lcoPrice, lcoPrev),  unit: '$/varil', label: 'Brent Ham Petrol'     },
+        NYF: { price: nyfPrice, ...calcChange(nyfPrice, nyfPrevP), unit: '$/ton',   label: 'Kalorifer Yakıtı NWE' },
+        LGO: { price: lgoPrice, ...calcChange(lgoPrice, lgoPrev),  unit: '$/ton',   label: 'Gas Oil (LGO)'        },
       },
       chart: chartData,
     });
