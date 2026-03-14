@@ -221,9 +221,9 @@
       </div>
     </div>
     <div class="price-block">
-      <div class="price-main">₺187.40</div>
-      <div class="price-change">▲ +4.40 (+2.40%)</div>
-      <div class="price-time">Son güncelleme: 18:00 · Borsa İstanbul</div>
+      <div class="price-main" id="tuprs-price">₺—</div>
+      <div class="price-change" id="tuprs-change" style="color:var(--text3);font-size:12px;">yükleniyor...</div>
+      <div class="price-time" id="tuprs-time">Borsa İstanbul</div>
     </div>
   </div>
 
@@ -242,25 +242,25 @@
   </div>
 
   <!-- 5 KPI KARTI -->
-  <div class="section-title">Anlık Öncü Göstergeler</div>
+  <div class="section-title">Anlık Öncü Göstergeler <span id="update-time" style="font-size:10px;font-weight:400;color:var(--text3);letter-spacing:0;text-transform:none;font-family:'IBM Plex Mono',monospace;"></span></div>
   <div class="kpi-row">
     <div class="kpi-card c-green fade-in">
       <div class="kpi-top"><div class="kpi-label">Brent Ham Petrol</div><span class="kpi-ticker kt-green">LCO</span></div>
-      <div class="kpi-value">$83.42</div>
-      <div class="kpi-sub"><span class="kpi-badge up">▲ +1.2%</span><span>$/varil · bugün</span></div>
-      <div class="kpi-foot">Maliyet kalemi · ICE Futures</div>
+      <div class="kpi-value" id="lco-price">$—</div>
+      <div class="kpi-sub" id="lco-change"><span class="kpi-badge" style="background:var(--surface2);color:var(--text3);">yükleniyor...</span></div>
+      <div class="kpi-foot">Maliyet kalemi · Yahoo Finance</div>
     </div>
     <div class="kpi-card c-blue fade-in">
       <div class="kpi-top"><div class="kpi-label">Fuel Oil 3.5% NWE</div><span class="kpi-ticker kt-blue">NYF</span></div>
-      <div class="kpi-value">$412.5</div>
-      <div class="kpi-sub"><span class="kpi-badge down">▼ -0.5%</span><span>$/ton · bugün</span></div>
-      <div class="kpi-foot">Satış kalemi (ağır) · ICE</div>
+      <div class="kpi-value" id="nyf-price">$—</div>
+      <div class="kpi-sub" id="nyf-change"><span class="kpi-badge" style="background:var(--surface2);color:var(--text3);">yükleniyor...</span></div>
+      <div class="kpi-foot">Satış kalemi (ağır) · ICE proxy</div>
     </div>
     <div class="kpi-card c-purple fade-in">
       <div class="kpi-top"><div class="kpi-label">Gasoil 0.1% NWE</div><span class="kpi-ticker kt-purple">GPR</span></div>
-      <div class="kpi-value" style="color:var(--purple)">$748.3</div>
-      <div class="kpi-sub"><span class="kpi-badge up">▲ +1.4%</span><span>$/ton · bugün</span></div>
-      <div class="kpi-foot">Satış kalemi (hafif) · ICE</div>
+      <div class="kpi-value" id="gpr-price" style="color:var(--purple)">$—</div>
+      <div class="kpi-sub" id="gpr-change"><span class="kpi-badge" style="background:var(--surface2);color:var(--text3);">yükleniyor...</span></div>
+      <div class="kpi-foot">Satış kalemi (hafif) · ICE proxy</div>
     </div>
     <div class="kpi-card c-warn fade-in">
       <div class="kpi-top"><div class="kpi-label">Med. Rafineri Marjı</div><span class="kpi-ticker kt-warn">MED</span></div>
@@ -531,7 +531,62 @@
     options:lineOpts()
   });
 
-  // Dönem butonları
+  // ── CANLI VERİ — /api/prices endpoint'inden çek ──
+  async function loadLivePrices() {
+    try {
+      const res = await fetch('/api/prices');
+      const json = await res.json();
+      if (!json.success) return;
+      const d = json.data;
+
+      // Güncelleme zamanı
+      const t = new Date(json.updatedAt);
+      document.getElementById('update-time').textContent =
+        '· ' + t.toLocaleTimeString('tr-TR', {hour:'2-digit',minute:'2-digit'}) + ' güncellendi';
+
+      // LCO
+      if (d.LCO && !d.LCO.error) {
+        document.getElementById('lco-price').textContent = '$' + d.LCO.price.toFixed(2);
+        const up = d.LCO.changePct >= 0;
+        document.getElementById('lco-change').innerHTML =
+          `<span class="kpi-badge ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(d.LCO.changePct)}%</span><span>$/varil · bugün</span>`;
+      }
+
+      // NYF
+      if (d.NYF && !d.NYF.error) {
+        document.getElementById('nyf-price').textContent = '$' + d.NYF.price.toFixed(0);
+        const up = d.NYF.changePct >= 0;
+        document.getElementById('nyf-change').innerHTML =
+          `<span class="kpi-badge ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(d.NYF.changePct)}%</span><span>$/ton · bugün</span>`;
+      }
+
+      // GPR
+      if (d.GPR && !d.GPR.error) {
+        document.getElementById('gpr-price').textContent = '$' + d.GPR.price.toFixed(0);
+        const up = d.GPR.changePct >= 0;
+        document.getElementById('gpr-change').innerHTML =
+          `<span class="kpi-badge ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(d.GPR.changePct)}%</span><span>$/ton · bugün</span>`;
+      }
+
+      // TÜPRAŞ hisse
+      if (d.TUPRS && !d.TUPRS.error) {
+        const up = d.TUPRS.changePct >= 0;
+        document.getElementById('tuprs-price').textContent = '₺' + d.TUPRS.price.toFixed(2);
+        document.getElementById('tuprs-price').style.color = up ? 'var(--green)' : 'var(--red)';
+        document.getElementById('tuprs-change').textContent =
+          (up ? '▲ +' : '▼ ') + d.TUPRS.change.toFixed(2) + ' (' + (up?'+':'') + d.TUPRS.changePct.toFixed(2) + '%)';
+        document.getElementById('tuprs-change').style.color = up ? 'var(--green)' : 'var(--red)';
+        document.getElementById('tuprs-time').textContent =
+          'Son güncelleme: ' + t.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}) + ' · Borsa İstanbul';
+      }
+
+    } catch(e) {
+      console.warn('Fiyat verisi yüklenemedi:', e.message);
+    }
+  }
+
+  // Sayfa açılışında çek
+  loadLivePrices();
   document.querySelectorAll('.chart-controls').forEach(ctrl=>{
     ctrl.querySelectorAll('.chart-btn').forEach(btn=>{
       btn.addEventListener('click',()=>{
