@@ -14,7 +14,6 @@ module.exports = async function handler(req, res) {
     );
 
     const data = rows.slice(1).filter(r => r[0] && r[1]);
-
     const latest = data[0];
     const prev   = data[1];
 
@@ -26,7 +25,7 @@ module.exports = async function handler(req, res) {
       return str;
     }
 
-    // Sayı parse — Türkçe ondalık (virgül)
+    // Sayı — Türkçe ondalık (virgül → nokta)
     function parseNum(str) {
       if (!str || str === '') return null;
       return parseFloat(str.replace(',', '.'));
@@ -42,30 +41,28 @@ module.exports = async function handler(req, res) {
       };
     }
 
+    // LCO — $/varil, direkt kullan
     const lcoPrice = parseNum(latest[1]);
     const lcoPrev  = parseNum(prev[1]);
 
-    // NYF: Sheet'te $/galon → $/ton dönüşümü
-    // Heating Oil: 1 galon = 3.785 litre, 1 ton ≈ 1100 litre → 1 ton ≈ 290 galon
-    const NYF_CONV = 290;
+    // NYF (Kalorifer Yakıtı) — $/galon → $/ton
+    // Fuel oil: 1 ton ≈ 264 galon
+    const NYF_CONV = 264;
     const nyfRaw   = parseNum(latest[2]);
     const nyfPrev  = parseNum(prev[2]);
     const nyfPrice = nyfRaw  ? parseFloat((nyfRaw  * NYF_CONV).toFixed(1)) : null;
     const nyfPrevP = nyfPrev ? parseFloat((nyfPrev * NYF_CONV).toFixed(1)) : null;
 
-    // GPR: Sheet'te $/galon → $/ton
-    const GPR_CONV = 290;
-    const gprRaw   = parseNum(latest[3]);
-    const gprPrev  = parseNum(prev[3]);
-    const gprPrice = gprRaw  ? parseFloat((gprRaw  * GPR_CONV).toFixed(1)) : null;
-    const gprPrevP = gprPrev ? parseFloat((gprPrev * GPR_CONV).toFixed(1)) : null;
+    // LGO (Gas Oil) — zaten $/ton, dönüşüm yok
+    const lgoPrice = parseNum(latest[3]);
+    const lgoPrev  = parseNum(prev[3]);
 
     // Son 60 günlük grafik verisi
     const chartData = data.slice(0, 60).reverse().map(row => ({
       date: parseDate(row[0]),
       lco:  parseNum(row[1]),
       nyf:  row[2] ? parseFloat((parseNum(row[2]) * NYF_CONV).toFixed(1)) : null,
-      gpr:  row[3] ? parseFloat((parseNum(row[3]) * GPR_CONV).toFixed(1)) : null,
+      lgo:  parseNum(row[3]),
     })).filter(r => r.date && r.lco);
 
     res.status(200).json({
@@ -73,9 +70,9 @@ module.exports = async function handler(req, res) {
       updatedAt: new Date().toISOString(),
       latest: {
         date: parseDate(latest[0]),
-        LCO: { price: lcoPrice,  ...calcChange(lcoPrice,  lcoPrev),  unit: '$/varil', label: 'Brent Ham Petrol'  },
-        NYF: { price: nyfPrice,  ...calcChange(nyfPrice,  nyfPrevP), unit: '$/ton',   label: 'Fuel Oil 3.5% NWE' },
-        GPR: { price: gprPrice,  ...calcChange(gprPrice,  gprPrevP), unit: '$/ton',   label: 'Gasoil 0.1% NWE'   },
+        LCO: { price: lcoPrice,  ...calcChange(lcoPrice,  lcoPrev),  unit: '$/varil', label: 'Brent Ham Petrol'      },
+        NYF: { price: nyfPrice,  ...calcChange(nyfPrice,  nyfPrevP), unit: '$/ton',   label: 'Kalorifer Yakıtı NWE'  },
+        LGO: { price: lgoPrice,  ...calcChange(lgoPrice,  lgoPrev),  unit: '$/ton',   label: 'Gas Oil (LGO)'         },
       },
       chart: chartData,
     });
