@@ -257,10 +257,10 @@
       <div class="kpi-foot">Satış kalemi (ağır) · ICE proxy</div>
     </div>
     <div class="kpi-card c-purple fade-in">
-      <div class="kpi-top"><div class="kpi-label">Gasoil 0.1% NWE</div><span class="kpi-ticker kt-purple">GPR</span></div>
+      <div class="kpi-top"><div class="kpi-label">Gas Oil (LGO)</div><span class="kpi-ticker kt-purple">LGO</span></div>
       <div class="kpi-value" id="gpr-price" style="color:var(--purple)">$—</div>
       <div class="kpi-sub" id="gpr-change"><span class="kpi-badge" style="background:var(--surface2);color:var(--text3);">yükleniyor...</span></div>
-      <div class="kpi-foot">Satış kalemi (hafif) · ICE proxy</div>
+      <div class="kpi-foot">Satış kalemi (hafif) · ICE</div>
     </div>
     <div class="kpi-card c-warn fade-in">
       <div class="kpi-top"><div class="kpi-label">Med. Rafineri Marjı</div><span class="kpi-ticker kt-warn">MED</span></div>
@@ -306,7 +306,7 @@
   <div class="grid-2-1">
     <div class="chart-card">
       <div class="chart-header">
-        <div class="chart-title">Gasoil 0.1% NWE <span class="ctag ct-purple">GPR</span><span class="src">· ICE Futures Europe</span></div>
+        <div class="chart-title">Gas Oil (LGO) <span class="ctag ct-purple">LGO</span><span class="src">· ICE Futures Europe</span></div>
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="update-badge"><span class="live-dot"></span> Günlük</div>
           <div class="chart-controls">
@@ -556,14 +556,14 @@
 
       updateKPI('lco-price', 'lco-change', d.LCO, '$');
       updateKPI('nyf-price', 'nyf-change', d.NYF, '$');
-      updateKPI('gpr-price', 'gpr-change', d.GPR, '$');
+      updateKPI('gpr-price', 'gpr-change', d.LGO, '$');
 
       // Grafikleri gerçek veriyle güncelle
       if (json.chart && json.chart.length > 0) {
         const labels = json.chart.map(r => r.date);
         const lcoD   = json.chart.map(r => r.lco);
         const nyfD   = json.chart.map(r => r.nyf);
-        const gprD   = json.chart.map(r => r.gpr);
+        const lgoD   = json.chart.map(r => r.lgo);
 
         if (window._lcoChart) {
           window._lcoChart.data.labels = labels;
@@ -577,7 +577,7 @@
         }
         if (window._gprChart) {
           window._gprChart.data.labels = labels;
-          window._gprChart.data.datasets[0].data = gprD;
+          window._gprChart.data.datasets[0].data = lgoD;
           window._gprChart.update();
         }
       }
