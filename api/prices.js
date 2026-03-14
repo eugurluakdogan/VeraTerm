@@ -2,90 +2,98 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=300');
 
-  const KEY = '50NCMZO0OCZ8UWOE';
-
-  // Emtia endpoint'i — Alpha Vantage'ın özel commodity fonksiyonu
-  async function fetchCommodity(func) {
-    try {
-      const url = `https://www.alphavantage.co/query?function=${func}&interval=daily&apikey=${KEY}`;
-      const r = await fetch(url);
-      const d = await r.json();
-      const series = d.data;
-      if (!series || !series[0]) return { error: true, message: 'Veri yok' };
-      const latest = series[0];   // en güncel
-      const prev   = series[1];   // bir önceki gün
-      const price     = parseFloat(latest.value);
-      const prevPrice = parseFloat(prev.value);
-      const change    = price - prevPrice;
-      const changePct = (change / prevPrice) * 100;
-      return {
-        price:     parseFloat(price.toFixed(2)),
-        prev:      parseFloat(prevPrice.toFixed(2)),
-        change:    parseFloat(change.toFixed(2)),
-        changePct: parseFloat(changePct.toFixed(2)),
-        date:      latest.date,
-      };
-    } catch(e) {
-      return { error: true, message: e.message };
-    }
-  }
-
-  // Hisse fiyatı — GLOBAL_QUOTE
-  async function fetchQuote(symbol) {
-    try {
-      const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${KEY}`;
-      const r = await fetch(url);
-      const d = await r.json();
-      const q = d['Global Quote'];
-      if (!q || !q['05. price']) return { error: true, message: 'Veri yok' };
-      const price     = parseFloat(q['05. price']);
-      const prev      = parseFloat(q['08. previous close']);
-      const change    = parseFloat(q['09. change']);
-      const changePct = parseFloat(q['10. change percent'].replace('%', ''));
-      return { price, prev, change, changePct };
-    } catch(e) {
-      return { error: true, message: e.message };
-    }
-  }
+  const SHEET_ID = '1qWbx3ce5f6mKG7KaXpPSXQq8pJxBk61TUs1IO2ut3vI';
 
   try {
-    // Paralel çek
-    // BRENT: Alpha Vantage Brent emtia fonksiyonu
-    // HEATING_OIL: NYF & GPR için proxy
-    // TUPRS.IS: Tüpraş hisse
-    const [lco, ho, tuprs] = await Promise.all([
-      fetchCommodity('BRENT'),        // Brent Ham Petrol $/varil
-      fetchCommodity('HEATING_OIL'),  // Heating Oil $/galon → ton'a çevireceğiz
-      fetchQuote('TUPRS.IS'),         // TÜPRAŞ Borsa İstanbul
-    ]);
+    // Google Sheets CSV export URL
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Sayfa1`;
+    const response = await fetch(url);
+    const csv = await response.text();
 
-    // Heating Oil $/galon → $/ton (1 ton ≈ 333 galon)
-    const nyf = !ho.error ? {
-      price:     parseFloat((ho.price * 333).toFixed(1)),
-      prev:      parseFloat((ho.prev  * 333).toFixed(1)),
-      change:    parseFloat((ho.change * 333).toFixed(1)),
-      changePct: ho.changePct,
-      date:      ho.date,
-    } : ho;
+    // CSV parse
+    const rows = csv.trim().split('\n').map(row =>
+      row.split(',').map(cell => cell.replace(/"/g, '').trim())
+    );
 
-    // GPR (Gasoil) — Heating Oil + %8 fark
-    const gpr = !ho.error ? {
-      price:     parseFloat((ho.price * 333 * 1.08).toFixed(1)),
-      prev:      parseFloat((ho.prev  * 333 * 1.08).toFixed(1)),
-      change:    parseFloat((ho.change * 333 * 1.08).toFixed(1)),
-      changePct: ho.changePct,
-      date:      ho.date,
-    } : ho;
+    // Başlık satırını atla, veriyi oku
+    const headers = rows[0]; // Tarih, LCO, NYF, GPR
+    const data = rows.slice(1).filter(r => r[0] && r[1]);
+
+    // En güncel satır (ilk satır = en yeni tarih)
+    const latest = data[0];
+    const prev   = data[1];
+
+    // Tarih: DD.MM.YYYY → düzelt
+    function parseDate(str) {
+      if (!str) return null;
+      const [d, m, y] = str.split('.');
+      return `${y}-${m}-${d}`;
+    }
+
+    // Sayı parse — Türkçe format (virgül ondalık ayraç)
+    function parseNum(str) {
+      if (!str) return null;
+      return parseFloat(str.replace(',', '.'));
+    }
+
+    // Değerleri al
+    const lcoPrice  = parseNum(latest[1]);
+    const lcoPrev   = parseNum(prev[1]);
+    const nyfRaw    = parseNum(latest[2]); // $/galon
+    const nyfPrev   = parseNum(prev[2]);
+    const gprRaw    = parseNum(latest[3]); // $/galon
+    const gprPrev   = parseNum(prev[3]);
+
+    // NYF & GPR: $/galon → $/ton (1 ton ≈ 333 galon)
+    const TON = 333;
+    const nyfPrice = parseFloat((nyfRaw * TON).toFixed(1));
+    const nyfPrevP = parseFloat((nyfPrev * TON).toFixed(1));
+    const gprPrice = parseFloat((gprRaw * TON).toFixed(1));
+    const gprPrevP = parseFloat((gprPrev * TON).toFixed(1));
+
+    // Değişim hesapla
+    function calcChange(price, prev) {
+      const change    = price - prev;
+      const changePct = (change / prev) * 100;
+      return {
+        change:    parseFloat(change.toFixed(2)),
+        changePct: parseFloat(changePct.toFixed(2)),
+      };
+    }
+
+    // Son 60 günlük veriyi grafik için hazırla
+    const chartData = data.slice(0, 60).reverse().map(row => ({
+      date:  parseDate(row[0]),
+      lco:   parseNum(row[1]),
+      nyf:   parseFloat((parseNum(row[2]) * TON).toFixed(1)),
+      gpr:   parseFloat((parseNum(row[3]) * TON).toFixed(1)),
+    })).filter(r => r.date && r.lco);
 
     res.status(200).json({
       success:   true,
       updatedAt: new Date().toISOString(),
-      data: {
-        LCO:   { ...lco,   label: 'Brent Ham Petrol',  unit: '$/varil' },
-        NYF:   { ...nyf,   label: 'Fuel Oil 3.5% NWE', unit: '$/ton'   },
-        GPR:   { ...gpr,   label: 'Gasoil 0.1% NWE',   unit: '$/ton'   },
-        TUPRS: { ...tuprs, label: 'TÜPRAŞ Hisse',       unit: '₺'       },
-      }
+      latest: {
+        date: parseDate(latest[0]),
+        LCO: {
+          price: lcoPrice,
+          ...calcChange(lcoPrice, lcoPrev),
+          unit:  '$/varil',
+          label: 'Brent Ham Petrol',
+        },
+        NYF: {
+          price: nyfPrice,
+          ...calcChange(nyfPrice, nyfPrevP),
+          unit:  '$/ton',
+          label: 'Fuel Oil 3.5% NWE',
+        },
+        GPR: {
+          price: gprPrice,
+          ...calcChange(gprPrice, gprPrevP),
+          unit:  '$/ton',
+          label: 'Gasoil 0.1% NWE',
+        },
+      },
+      chart: chartData, // grafik için tarihsel dizi
     });
 
   } catch(e) {
