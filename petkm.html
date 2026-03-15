@@ -6,21 +6,75 @@
 <title>Petkim (PETKM) — VeraTerm</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  :root{--bg:#0a0c10;--surface:#111418;--surface2:#181c22;--border:#1f2530;--accent:#00d4a8;--accent2:#3b82f6;--warn:#f59e0b;--text:#e8edf5;--text2:#8892a4;--text3:#4a5568;--green:#10b981;--red:#ef4444}
+  :root{--bg:#0a0c10;--surface:#111418;--surface2:#181c22;--border:#1f2530;--accent:#00d4a8;--accent2:#3b82f6;--warn:#f59e0b;--text:#e8edf5;--text2:#8892a4;--text3:#4a5568;--green:#10b981;--red:#ef4444;--purple:#a855f7;--orange:#f97316}
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5}
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   .main{max-width:1400px;margin:0 auto;padding:28px 32px}
   .breadcrumb{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:12px;margin-bottom:20px;font-family:'IBM Plex Mono',monospace}
   .breadcrumb a{color:var(--text2);text-decoration:none}.breadcrumb a:hover{color:var(--accent)}
   .breadcrumb span{color:var(--text2)}
-  .coming-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center}
-  .cs-icon{font-size:48px;opacity:.5}
-  .cs-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--text2)}
-  .cs-text{font-size:14px;color:var(--text3);max-width:400px;line-height:1.7}
-  .cs-badge{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:var(--warn);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;font-family:'IBM Plex Mono',monospace}
+  .company-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+  .company-info{display:flex;align-items:center;gap:16px}
+  .company-logo{width:52px;height:52px;background:linear-gradient(135deg,#1a3a2f,#0a1f17);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:var(--accent)}
+  .company-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.5px}
+  .company-meta{display:flex;align-items:center;gap:8px;margin-top:4px}
+  .tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase}
+  .tag-sector{background:rgba(249,115,22,.15);color:var(--orange);border:1px solid rgba(249,115,22,.2)}
+  .tag-bist{background:rgba(0,212,168,.1);color:var(--accent);border:1px solid rgba(0,212,168,.2)}
+  .price-block{text-align:right}
+  .price-main{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600;letter-spacing:-1px}
+  .price-change{font-family:'IBM Plex Mono',monospace;font-size:14px;margin-top:2px}
+  .price-time{font-size:11px;color:var(--text3);margin-top:2px}
+  .section-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+  .chart-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .chart-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .chart-title .src{font-size:10px;color:var(--text3);font-weight:400}
+  .chart-body{padding:16px}
+  .ctag{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;padding:2px 6px;border-radius:3px}
+  .ct-green{background:rgba(0,212,168,.12);color:var(--accent)}
+  .ct-blue{background:rgba(59,130,246,.12);color:var(--accent2)}
+  .ct-orange{background:rgba(249,115,22,.12);color:var(--orange)}
+  .ct-purple{background:rgba(168,85,247,.12);color:var(--purple)}
+  .ct-warn{background:rgba(245,158,11,.12);color:var(--warn)}
+  .ct-teal{background:rgba(16,185,129,.12);color:var(--green)}
+  .update-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
+  .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;display:inline-block;animation:pulse 2s infinite}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+  .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+  .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;position:relative;overflow:hidden;transition:border-color .2s;animation:fadeIn .4s ease forwards;opacity:0}
+  .kpi-card:hover{border-color:var(--text3)}
+  .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+  .kpi-card.c-green::before{background:var(--accent)}.kpi-card.c-orange::before{background:var(--orange)}
+  .kpi-card:nth-child(1){animation-delay:.05s}.kpi-card:nth-child(2){animation-delay:.1s}
+  .kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .kpi-label{font-size:12px;color:var(--text2);font-weight:500}
+  .kpi-ticker{font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace}
+  .kt-green{background:rgba(0,212,168,.12);color:var(--accent)}.kt-orange{background:rgba(249,115,22,.12);color:var(--orange)}
+  .kpi-value{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600;letter-spacing:-.5px;margin-bottom:8px}
+  .kpi-sub{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+  .kpi-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace}
+  .kpi-badge.up{background:rgba(16,185,129,.15);color:var(--green)}.kpi-badge.down{background:rgba(239,68,68,.15);color:var(--red)}
+  .kpi-foot{margin-top:10px;font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
+  .legend{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-family:'IBM Plex Mono',monospace}
+  .legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+  .notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+  .note-card{border-radius:8px;padding:14px 16px;font-size:12px;line-height:1.7;display:flex;gap:10px;align-items:flex-start}
+  .note-card.positive{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2)}
+  .note-card.negative{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2)}
+  .note-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+  .note-title{font-weight:600;margin-bottom:4px;font-size:13px}
+  .note-card.positive .note-title{color:var(--green)}.note-card.negative .note-title{color:var(--red)}
   footer{border-top:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;color:var(--text3);font-size:12px;font-family:'IBM Plex Mono',monospace;margin-top:32px}
+  @media(max-width:1100px){.grid-3{grid-template-columns:1fr 1fr}}
+  @media(max-width:900px){.kpi-row,.grid-2,.notes-grid,.grid-3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -33,14 +87,151 @@
     <span>PETKM</span>
   </div>
 
-  <div class="coming-soon">
-    <div class="cs-icon">🧪</div>
-    <span class="cs-badge">YAKINDA</span>
-    <div class="cs-title">Petkim Sayfası</div>
-    <div class="cs-text">
-      Petkim için öncü göstergeler, naften ve etilen fiyatları, kapasite kullanım oranları yakında bu sayfada yayınlanacak.
+  <div class="company-header">
+    <div class="company-info">
+      <div class="company-logo">PETKİM</div>
+      <div>
+        <div class="company-name">Petkim</div>
+        <div class="company-meta">
+          <span class="tag tag-sector">Petrokimya</span>
+          <span class="tag tag-bist">BIST 100</span>
+        </div>
+      </div>
+    </div>
+    <div class="price-block">
+      <div class="price-main" id="petkm-header-price" style="color:var(--green)">₺—</div>
+      <div class="price-change" id="petkm-header-change" style="color:var(--text3);font-size:12px;">yükleniyor...</div>
+      <div class="price-time" id="petkm-header-time">Borsa İstanbul · Aylık</div>
     </div>
   </div>
+
+  <!-- ETİLEN-NAFTA MAKASI -->
+  <div class="section-title">Etilen-Nafta Makası <span id="update-time" style="font-size:10px;font-weight:400;color:var(--text3);letter-spacing:0;text-transform:none;font-family:'IBM Plex Mono',monospace;"></span></div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div class="chart-title">Etilen-Nafta Makası <span class="ctag ct-orange">$/ton</span><span class="src">· 2025–2026 Aylık</span></div>
+      <div class="update-badge"><span style="width:7px;height:7px;background:var(--orange);border-radius:50%;display:inline-block;"></span> Aylık · Sheet</div>
+    </div>
+    <div class="chart-body">
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#f97316;"></span>Etilen-Nafta Makası</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#3b82f6;opacity:.8;"></span>Nafta (sağ eksen)</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#a855f7;opacity:.8;"></span>Etilen (sağ eksen)</div>
+      </div>
+      <canvas id="makasChart" style="max-height:360px;"></canvas>
+    </div>
+  </div>
+
+  <!-- POLİMER FİYATLARI -->
+  <div class="section-title">Polimer Fiyatları</div>
+  <div class="grid-3">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">LDPE <span class="ctag ct-blue">$/ton</span></div>
+        <div class="update-badge"><span class="live-dot"></span> Aylık</div>
+      </div>
+      <div class="chart-body"><canvas id="ldpeChart" style="max-height:200px;"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">HDPE <span class="ctag ct-purple">$/ton</span></div>
+        <div class="update-badge"><span class="live-dot"></span> Aylık</div>
+      </div>
+      <div class="chart-body"><canvas id="hdpeChart" style="max-height:200px;"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">PP <span class="ctag ct-warn">$/ton</span></div>
+        <div class="update-badge"><span class="live-dot"></span> Aylık</div>
+      </div>
+      <div class="chart-body"><canvas id="ppChart" style="max-height:200px;"></canvas></div>
+    </div>
+  </div>
+
+  <!-- POLİMER MARJI -->
+  <div class="section-title">Polimer Marjı</div>
+  <div class="grid-3">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Ağırlıklı Polimer Fiyatı <span class="ctag ct-teal">$/ton</span></div>
+        <div class="update-badge"><span class="live-dot"></span> Aylık</div>
+      </div>
+      <div class="chart-body"><canvas id="polChart" style="max-height:200px;"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Nafta Fiyatı <span class="ctag ct-blue">$/ton</span></div>
+        <div class="update-badge"><span class="live-dot"></span> Aylık</div>
+      </div>
+      <div class="chart-body"><canvas id="naftaChart" style="max-height:200px;"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Polimer Marjı <span class="ctag ct-orange">$/ton</span></div>
+        <div class="update-badge"><span class="live-dot"></span> Aylık</div>
+      </div>
+      <div class="chart-body"><canvas id="polMarjChart" style="max-height:200px;"></canvas></div>
+    </div>
+  </div>
+
+  <!-- KPI + PETKM Hisse -->
+  <div class="section-title">Hisse Fiyatı</div>
+  <div class="kpi-row">
+    <div class="kpi-card c-green">
+      <div class="kpi-top"><div class="kpi-label">Petkim Hisse Fiyatı</div><span class="kpi-ticker kt-green">PETKM</span></div>
+      <div class="kpi-value" id="kpi-petkm" style="color:var(--green)">₺—</div>
+      <div class="kpi-sub" id="kpi-petkm-sub"><span class="kpi-badge" style="background:var(--surface2);color:var(--text3);">yükleniyor...</span></div>
+      <div class="kpi-foot" id="kpi-petkm-date">Borsa İstanbul · Aylık veri</div>
+    </div>
+    <div class="kpi-card c-orange">
+      <div class="kpi-top"><div class="kpi-label">Etilen-Nafta Makası (Son)</div><span class="kpi-ticker kt-orange">MAKAS</span></div>
+      <div class="kpi-value" id="kpi-makas" style="color:var(--orange)">$—</div>
+      <div class="kpi-sub" id="kpi-makas-sub"><span class="kpi-badge" style="background:var(--surface2);color:var(--text3);">—</span></div>
+      <div class="kpi-foot" id="kpi-makas-date">Son veri · Aylık</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <div class="chart-title">Petkim Hisse Fiyatı <span class="ctag ct-green">PETKM</span><span class="src">· Borsa İstanbul</span></div>
+      <div class="update-badge"><span class="live-dot"></span> Aylık</div>
+    </div>
+    <div class="chart-body"><canvas id="petkmChart" style="max-height:260px;"></canvas></div>
+  </div>
+
+  <!-- NOTLAR -->
+  <div class="section-title">Veri Yorumlama Rehberi</div>
+  <div class="notes-grid">
+    <div class="note-card positive">
+      <div class="note-icon">📈</div>
+      <div>
+        <div class="note-title">Etilen-Nafta Makası ↑ → OLUMLU</div>
+        Makas genişlediğinde cracker kârlılığı artar. $200/ton üzeri güçlü, $150/ton sağlıklı, $100/ton altı baskılı seviyelere işaret eder.
+      </div>
+    </div>
+    <div class="note-card negative">
+      <div class="note-icon">📉</div>
+      <div>
+        <div class="note-title">Makas $100/ton Altı → DİKKAT</div>
+        2026 başında görülen $50-100/ton bandı Petkim için kritik baskı bölgesidir. Üretim ekonomisi bozulur.
+      </div>
+    </div>
+    <div class="note-card positive">
+      <div class="note-icon">✅</div>
+      <div>
+        <div class="note-title">Polimer Marjı ↑ → OLUMLU</div>
+        LDPE/HDPE/PP fiyatları hammadde maliyetinin üzerinde artarsa Petkim'in satış gelirleri ve kârlılığı güçlenir.
+      </div>
+    </div>
+    <div class="note-card negative">
+      <div class="note-icon">⚠️</div>
+      <div>
+        <div class="note-title">Nafta ↑, Polimer Durağan → OLUMSUZ</div>
+        Hammadde maliyeti artarken ürün fiyatları yükselmezse marj sıkışır. Çin'den gelen ucuz polimer arzı bu riski artırır.
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <footer>
@@ -48,6 +239,174 @@
   <span>Veriler bilgi amaçlıdır, yatırım tavsiyesi değildir.</span>
 </footer>
 
-<script src="/nav.js"></script>
+<script>
+  Chart.defaults.color='#8892a4';Chart.defaults.borderColor='#1f2530';
+  Chart.defaults.font.family="'IBM Plex Mono', monospace";Chart.defaults.font.size=11;
+  const tip={backgroundColor:'#181c22',borderColor:'#2a3140',borderWidth:1,padding:10,titleColor:'#e8edf5',bodyColor:'#8892a4'};
+
+  function mkGrad(ctx,hex,a=.15){
+    const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height);
+    g.addColorStop(0,hex+Math.round(a*255).toString(16).padStart(2,'0'));
+    g.addColorStop(1,hex+'03');return g;
+  }
+  function lineOpts(fmt=v=>'$'+Math.round(v),mini=false){
+    return{responsive:true,maintainAspectRatio:true,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{...tip,callbacks:{label:c=>'  '+fmt(c.parsed.y)}}},
+      scales:{x:{grid:{color:'rgba(31,37,48,.6)'},ticks:{maxTicksLimit:mini?6:12}},
+        y:{grid:{color:'rgba(31,37,48,.6)'},ticks:{maxTicksLimit:5,callback:fmt}}},
+      elements:{point:{radius:3,hoverRadius:6},line:{tension:.35,borderWidth:2}}};
+  }
+
+  // Boş grafikler
+  window._petkmChart=new Chart(document.getElementById('petkmChart'),{type:'line',data:{labels:[],datasets:[{data:[],borderColor:'#00d4a8',backgroundColor:ctx=>mkGrad(ctx,'#00d4a8'),fill:true}]},options:lineOpts(v=>'₺'+v.toFixed(2))});
+
+  const miniCharts={
+    ldpe:{id:'ldpeChart',color:'#3b82f6'},
+    hdpe:{id:'hdpeChart',color:'#a855f7'},
+    pp:  {id:'ppChart',  color:'#f59e0b'},
+    pol: {id:'polChart', color:'#10b981'},
+    nafta:{id:'naftaChart',color:'#3b82f6'},
+  };
+  Object.values(miniCharts).forEach(c=>{
+    c.chart=new Chart(document.getElementById(c.id),{type:'line',data:{labels:[],datasets:[{data:[],borderColor:c.color,backgroundColor:ctx=>mkGrad(ctx,c.color),fill:true}]},options:lineOpts(v=>'$'+Math.round(v),true)});
+  });
+  const polMarjCh=new Chart(document.getElementById('polMarjChart'),{
+    type:'bar',data:{labels:[],datasets:[{data:[],backgroundColor:[],borderColor:[],borderWidth:1,borderRadius:3}]},
+    options:lineOpts(v=>'$'+Math.round(v),true)
+  });
+
+  // Aralık değer → orta nokta ("~650-680" → 665, "~950-1000 (tahmini)" → 975, "~50-100 (başlangıç...)" → 75)
+  function parseRange(s){
+    if(!s||s==='')return null;
+    s=s.toString().replace(/~|,/g,'').trim();
+    // Parantez içini temizle
+    s=s.replace(/\(.*?\)/g,'').trim();
+    // Sayı-sayı aralığı
+    const m=s.match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/);
+    if(m)return(parseFloat(m[1])+parseFloat(m[2]))/2;
+    // Tek sayı
+    const n=parseFloat(s.replace(/[^\d.]/g,''));
+    return isNaN(n)?null:n;
+  }
+
+  // Türkçe sayı parse
+  function pn(s){
+    if(!s||s==='')return null;
+    s=s.toString().trim();
+    if(s.includes(',')&&!s.includes('-'))return parseFloat(s.replace(',','.'));
+    return parseRange(s);
+  }
+
+  async function loadData(){
+    try{
+      const SHEET_ID='1qWbx3ce5f6mKG7KaXpPSXQq8pJxBk61TUs1IO2ut3vI';
+      const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=PETKM`;
+      const r=await fetch(url);const csv=await r.text();
+
+      const rows=csv.trim().split('\n').map(row=>{
+        const cells=[];let cur='',inQ=false;
+        for(const c of row){if(c==='"'){inQ=!inQ;continue;}if(c===','&&!inQ){cells.push(cur.trim());cur='';continue;}cur+=c;}
+        cells.push(cur.trim());return cells;
+      });
+
+      // Başlık satırı atla, ay ismi olan satırları al
+      const AY_PATTERN=/^(Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)/i;
+      const data=rows.filter(r=>r[0]&&AY_PATTERN.test(r[0]));
+
+      if(data.length===0){
+        document.getElementById('update-time').textContent='· Veri bekleniyor';
+        return;
+      }
+
+      const labels  = data.map(r=>r[0]);
+      const naftaD  = data.map(r=>pn(r[1]));
+      const etilenD = data.map(r=>pn(r[2]));
+      const makasD  = data.map(r=>pn(r[3]));
+      const ldpeD   = data.map(r=>pn(r[4]));
+      const hdpeD   = data.map(r=>pn(r[5]));
+      const ppD     = data.map(r=>pn(r[6]));
+      const polD    = data.map(r=>pn(r[7]));
+      const polMarjD= data.map(r=>pn(r[8]));
+      const petkmD  = data.map(r=>pn(r[9]));
+
+      // ── Etilen-Nafta Makası grafiği ──
+      if(window._makasChart)window._makasChart.destroy();
+      window._makasChart=new Chart(document.getElementById('makasChart'),{
+        type:'line',
+        data:{labels,datasets:[
+          {label:'Makas',data:makasD,borderColor:'#f97316',backgroundColor:ctx=>mkGrad(ctx,'#f97316',.2),fill:true,tension:.3,borderWidth:2.5,pointRadius:4,spanGaps:true,yAxisID:'y'},
+          {label:'Nafta',data:naftaD,borderColor:'#3b82f6',fill:false,tension:.3,borderWidth:1.5,pointRadius:3,borderDash:[5,3],spanGaps:true,yAxisID:'y2'},
+          {label:'Etilen',data:etilenD,borderColor:'#a855f7',fill:false,tension:.3,borderWidth:1.5,pointRadius:3,borderDash:[5,3],spanGaps:true,yAxisID:'y2'},
+        ]},
+        options:{responsive:true,maintainAspectRatio:true,interaction:{mode:'index',intersect:false},
+          plugins:{legend:{display:false},tooltip:{...tip,callbacks:{label:c=>`  ${c.dataset.label}: $${Math.round(c.parsed.y)}/ton`}}},
+          scales:{
+            x:{grid:{color:'rgba(31,37,48,.6)'},ticks:{maxTicksLimit:12}},
+            y:{grid:{color:'rgba(31,37,48,.6)'},ticks:{maxTicksLimit:5,callback:v=>'$'+v},title:{display:true,text:'Makas $/ton',color:'#f97316',font:{size:10}}},
+            y2:{position:'right',grid:{display:false},ticks:{maxTicksLimit:5,callback:v=>'$'+v},title:{display:true,text:'Fiyat $/ton',color:'#8892a4',font:{size:10}}}
+          }}
+      });
+
+      // ── Mini grafikler ──
+      const updates={
+        ldpe:{data:ldpeD},hdpe:{data:hdpeD},pp:{data:ppD},
+        pol:{data:polD},nafta:{data:naftaD}
+      };
+      Object.entries(updates).forEach(([k,v])=>{
+        const c=miniCharts[k].chart;
+        c.data.labels=labels;c.data.datasets[0].data=v.data;c.update();
+      });
+
+      // Polimer Marjı bar
+      polMarjCh.data.labels=labels;
+      polMarjCh.data.datasets[0].data=polMarjD;
+      polMarjCh.data.datasets[0].backgroundColor=polMarjD.map(v=>v!=null&&v>=400?'rgba(16,185,129,.65)':v!=null&&v>=300?'rgba(245,158,11,.65)':'rgba(239,68,68,.65)');
+      polMarjCh.data.datasets[0].borderColor=polMarjD.map(v=>v!=null&&v>=400?'#10b981':v!=null&&v>=300?'#f59e0b':'#ef4444');
+      polMarjCh.update();
+
+      // PETKM hisse grafiği
+      window._petkmChart.data.labels=labels;
+      window._petkmChart.data.datasets[0].data=petkmD;
+      window._petkmChart.update();
+
+      // ── KPI ──
+      const lastIdx=data.length-1;
+      const lastMakas=makasD[lastIdx],prevMakas=makasD[lastIdx-1];
+      if(lastMakas!=null){
+        document.getElementById('kpi-makas').textContent='$'+Math.round(lastMakas)+'/ton';
+        document.getElementById('kpi-makas').style.color=lastMakas>=200?'var(--green)':lastMakas>=100?'var(--warn)':'var(--red)';
+        if(prevMakas!=null){
+          const up=lastMakas>=prevMakas,diff=Math.round(lastMakas-prevMakas);
+          document.getElementById('kpi-makas-sub').innerHTML=`<span class="kpi-badge ${up?'up':'down'}">${up?'▲ +':'▼ '}${Math.abs(diff)}/ton önceki aya göre</span>`;
+        }
+        document.getElementById('kpi-makas-date').textContent='Son: '+labels[lastIdx];
+      }
+
+      const lastPetkm=petkmD[lastIdx],prevPetkm=petkmD[lastIdx-1];
+      if(lastPetkm!=null){
+        const up=prevPetkm?lastPetkm>=prevPetkm:true,col=up?'var(--green)':'var(--red)';
+        document.getElementById('petkm-header-price').textContent='₺'+lastPetkm.toFixed(2);
+        document.getElementById('petkm-header-price').style.color=col;
+        document.getElementById('kpi-petkm').textContent='₺'+lastPetkm.toFixed(2);
+        document.getElementById('kpi-petkm').style.color=col;
+        if(prevPetkm){
+          const chg=lastPetkm-prevPetkm,pct=chg/prevPetkm*100;
+          document.getElementById('petkm-header-change').textContent=(up?'▲ +':'▼ ')+chg.toFixed(2)+' ('+(up?'+':'')+pct.toFixed(2)+'%)';
+          document.getElementById('petkm-header-change').style.color=col;
+          document.getElementById('kpi-petkm-sub').innerHTML=`<span class="kpi-badge ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(pct).toFixed(2)}%</span><span>₺ · aylık değişim</span>`;
+        }
+        document.getElementById('kpi-petkm-date').textContent='Son: '+labels[lastIdx];
+        document.getElementById('petkm-header-time').textContent='Aylık · '+labels[lastIdx];
+      }
+
+      document.getElementById('update-time').textContent='· '+labels[lastIdx]+' verisi yüklendi';
+
+    }catch(e){
+      document.getElementById('update-time').textContent='· Veri yüklenemedi';
+      console.warn('PETKM:',e.message);
+    }
+  }
+  loadData();
+</script>
 </body>
 </html>
