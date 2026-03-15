@@ -1,53 +1,61 @@
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cache-Control', 's-maxage=60');
+  res.setHeader('Cache-Control', 's-maxage=300');
 
   const SHEET_ID = '1qWbx3ce5f6mKG7KaXpPSXQq8pJxBk61TUs1IO2ut3vI';
 
-  function parseDate(str) {
-    if (!str) return null;
-    const parts = str.split('.');
-    if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    return str;
-  }
-
+  // Sayı parse — Türkçe/İngilizce karışık
   function parseNum(str) {
     if (!str || str === '') return null;
     str = str.trim();
-    if (str.includes('.') && str.includes(',')) {
-      return parseFloat(str.replace(/\./g, '').replace(',', '.'));
-    }
+    if (str.includes('.') && str.includes(',')) return parseFloat(str.replace(/\./g, '').replace(',', '.'));
     if (str.includes(',')) {
-      const parts = str.split(',');
-      if (parts[1] && parts[1].length <= 2) return parseFloat(str.replace(',', '.'));
-      return parseFloat(str.replace(/,/g, ''));
+      const p = str.split(',');
+      return p[1] && p[1].length <= 2 ? parseFloat(str.replace(',', '.')) : parseFloat(str.replace(/,/g, ''));
     }
     if (str.includes('.')) {
-      const parts = str.split('.');
-      if (parts[1] && parts[1].length === 3) return parseFloat(str.replace(/\./g, ''));
-      return parseFloat(str);
+      const p = str.split('.');
+      return p[1] && p[1].length === 3 ? parseFloat(str.replace(/\./g, '')) : parseFloat(str);
     }
     return parseFloat(str);
   }
 
-  function calcChange(price, prevPrice) {
-    if (!price || !prevPrice) return { change: 0, changePct: 0 };
-    const change    = price - prevPrice;
-    const changePct = (change / prevPrice) * 100;
-    return {
-      change:    parseFloat(change.toFixed(2)),
-      changePct: parseFloat(changePct.toFixed(2)),
-    };
+  // Yahoo Finance fiyat çek
+  async function fetchYahoo(symbol) {
+    try {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`;
+      const r = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/json, text/plain, */*',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Referer': 'https://finance.yahoo.com',
+        }
+      });
+      const d = await r.json();
+      const meta = d.chart.result[0].meta;
+      const price = meta.regularMarketPrice;
+      const prev  = meta.chartPreviousClose;
+      const change    = price - prev;
+      const changePct = (change / prev) * 100;
+      return {
+        price:     parseFloat(price.toFixed(2)),
+        change:    parseFloat(change.toFixed(2)),
+        changePct: parseFloat(changePct.toFixed(2)),
+        currency:  meta.currency,
+      };
+    } catch(e) {
+      return { error: true, message: e.message };
+    }
   }
 
-  async function fetchCSV(sheetName) {
+  // Google Sheet CSV çek
+  async function fetchSheet(sheetName) {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
     const r = await fetch(url);
     const text = await r.text();
     return text.trim().split('\n').map(row => {
-      // CSV parse — quoted fields içinde virgül olabilir
-      const cells = [];
-      let cur = '', inQ = false;
+      const cells = []; let cur = '', inQ = false;
       for (let i = 0; i < row.length; i++) {
         const c = row[i];
         if (c === '"') { inQ = !inQ; continue; }
@@ -60,43 +68,19 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // ── SAYFA 1: LCO / NYF / LGO ──
-    const rows1 = await fetchCSV('Sayfa1');
-    const data1 = rows1.slice(1).filter(r => r[0] && r[1] && r[1] !== '');
-    const latest = data1[0];
-    const prev   = data1[1];
+    // Brent ve TÜPRAŞ fiyatlarını paralel çek
+    const [brent, tuprs] = await Promise.all([
+      fetchYahoo('BZ=F'),       // Brent Ham Petrol
+      fetchYahoo('TUPRS.IS'),   // TÜPRAŞ Borsa İstanbul
+    ]);
 
-    const lcoPrice = parseNum(latest[1]);
-    const lcoPrev  = parseNum(prev[1]);
-
-    const NYF_CONV = 264;
-    const nyfRaw   = parseNum(latest[2]);
-    const nyfPrev  = parseNum(prev[2]);
-    const nyfPrice = nyfRaw  ? parseFloat((nyfRaw  * NYF_CONV).toFixed(1)) : null;
-    const nyfPrevP = nyfPrev ? parseFloat((nyfPrev * NYF_CONV).toFixed(1)) : null;
-
-    const lgoPrice = parseNum(latest[3]);
-    const lgoPrev  = parseNum(prev[3]);
-
-    const chartData = data1.slice(0, 60).reverse().map(row => ({
-      date: parseDate(row[0]),
-      lco:  parseNum(row[1]),
-      nyf:  row[2] ? parseFloat((parseNum(row[2]) * NYF_CONV).toFixed(1)) : null,
-      lgo:  parseNum(row[3]),
-    })).filter(r => r.date && r.lco);
-
-    // ── TUPRS SEKMESİ ──
-    const rowsTuprs = await fetchCSV('TUPRS');
-
-    // Debug: tüm satırları gör
-    // Sheet yapısı: B=ay adı, C=2025 Tüpraş, D=2025 Avrupa, E=2026 Tüpraş, F=2026 Avrupa
-    // İlk 2 satır başlık, 3. satırdan itibaren veri
+    // TUPRS Sheet'inden marj verisi çek
+    const rowsTuprs = await fetchSheet('TUPRS');
     const months = ['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'];
 
-    // Ay adı içeren satırları bul (başlık satırlarını otomatik atla)
-    const tuprsData = rowsTuprs.filter(r => {
-      const ayStr = (r[1] || '').trim().toUpperCase();
-      return months.includes(ayStr);
+    const marjData = rowsTuprs.filter(r => {
+      const ay = (r[1] || '').trim().toUpperCase();
+      return months.includes(ay);
     }).map(row => ({
       ay:         row[1].trim(),
       tuprs2025:  parseNum(row[2]),
@@ -105,35 +89,21 @@ module.exports = async function handler(req, res) {
       avrupa2026: parseNum(row[5]),
     }));
 
-    const son2026 = tuprsData.filter(r => r.tuprs2026 != null).slice(-1)[0];
-    const son2025 = tuprsData.filter(r => r.tuprs2025 != null).slice(-1)[0];
-
     res.status(200).json({
       success:   true,
       updatedAt: new Date().toISOString(),
-      latest: {
-        date: parseDate(latest[0]),
-        LCO: { price: lcoPrice, ...calcChange(lcoPrice, lcoPrev),  unit: '$/varil', label: 'Brent Ham Petrol'     },
-        NYF: { price: nyfPrice, ...calcChange(nyfPrice, nyfPrevP), unit: '$/ton',   label: 'Kalorifer Yakıtı NWE' },
-        LGO: { price: lgoPrice, ...calcChange(lgoPrice, lgoPrev),  unit: '$/ton',   label: 'Gas Oil (LGO)'        },
-        TUPRS_MARJ: {
-          price2025: son2025?.tuprs2025 ?? null,
-          price2026: son2026?.tuprs2026 ?? null,
-          label: 'TÜPRAŞ Motorin Marjı',
-          unit: '$/ton',
-        },
-      },
-      chart: chartData,
+      brent,
+      tuprs,
       marjChart: {
-        labels:     tuprsData.map(r => r.ay),
-        tuprs2025:  tuprsData.map(r => r.tuprs2025),
-        avrupa2025: tuprsData.map(r => r.avrupa2025),
-        tuprs2026:  tuprsData.map(r => r.tuprs2026),
-        avrupa2026: tuprsData.map(r => r.avrupa2026),
+        labels:     marjData.map(r => r.ay),
+        tuprs2025:  marjData.map(r => r.tuprs2025),
+        avrupa2025: marjData.map(r => r.avrupa2025),
+        tuprs2026:  marjData.map(r => r.tuprs2026),
+        avrupa2026: marjData.map(r => r.avrupa2026),
       },
     });
 
   } catch(e) {
-    res.status(500).json({ success: false, error: e.message, stack: e.stack });
+    res.status(500).json({ success: false, error: e.message });
   }
 };
