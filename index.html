@@ -17,6 +17,7 @@
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5}
 
+  /* TOPBAR */
   .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
   .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
   .logo span{color:var(--accent)}
@@ -36,11 +37,13 @@
   .btn-primary{background:var(--accent);color:#000;font-weight:600}
   .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
 
+  /* MAIN */
   .main{max-width:1400px;margin:0 auto;padding:28px 32px}
   .breadcrumb{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:12px;margin-bottom:20px;font-family:'IBM Plex Mono',monospace}
   .breadcrumb span{color:var(--text2)}
 
-  .company-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px}
+  /* COMPANY HEADER */
+  .company-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--border)}
   .company-info{display:flex;align-items:center;gap:16px}
   .company-logo{width:52px;height:52px;background:linear-gradient(135deg,#1e3a5f,#0a1929);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:var(--accent)}
   .company-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.5px}
@@ -53,16 +56,12 @@
   .price-change{font-family:'IBM Plex Mono',monospace;font-size:14px;margin-top:2px}
   .price-time{font-size:11px;color:var(--text3);margin-top:2px}
 
-  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:24px}
-  .tab{padding:10px 16px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
-  .tab:hover{color:var(--text)}
-  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-
+  /* SECTION TITLE */
   .section-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
   .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
 
-  /* KPI — 2 kart */
-  .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  /* KPI */
+  .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
   .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;position:relative;overflow:hidden;transition:border-color .2s}
   .kpi-card:hover{border-color:var(--text3)}
   .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
@@ -73,7 +72,7 @@
   .kpi-ticker{font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace}
   .kt-green{background:rgba(0,212,168,.12);color:var(--accent)}
   .kt-blue{background:rgba(59,130,246,.12);color:var(--accent2)}
-  .kpi-value{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;letter-spacing:-.5px;margin-bottom:8px}
+  .kpi-value{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600;letter-spacing:-.5px;margin-bottom:8px}
   .kpi-sub{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
   .kpi-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace}
   .kpi-badge.up{background:rgba(16,185,129,.15);color:var(--green)}
@@ -83,39 +82,28 @@
   @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   .fade-in:nth-child(1){animation-delay:.05s}.fade-in:nth-child(2){animation-delay:.1s}
 
-  /* CHART CARDS */
+  /* CHARTS */
   .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
   .chart-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
   .chart-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
   .chart-title .src{font-size:10px;color:var(--text3);font-weight:400}
   .chart-body{padding:16px}
-  .chart-controls{display:flex;gap:4px}
-  .chart-btn{font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s}
-  .chart-btn:hover,.chart-btn.active{background:var(--surface2);color:var(--text);border-color:var(--text3)}
   .ctag{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;padding:2px 6px;border-radius:3px}
   .ct-green{background:rgba(0,212,168,.12);color:var(--accent)}
   .ct-blue{background:rgba(59,130,246,.12);color:var(--accent2)}
   .ct-teal{background:rgba(16,185,129,.12);color:var(--green)}
   .update-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
   .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;display:inline-block;animation:pulse 2s infinite}
-
-  /* GRID */
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 
-  /* LEGEND */
+  /* MARJ LEGEND */
   .marj-legend{display:flex;gap:20px;margin-bottom:12px;flex-wrap:wrap}
   .legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-family:'IBM Plex Mono',monospace}
   .legend-line{width:20px;height:3px;border-radius:2px;display:inline-block}
 
-  /* PREMIUM */
-  .prem-wrap{position:relative;overflow:hidden}
-  .prem-overlay{position:absolute;inset:0;background:rgba(10,12,16,.85);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10}
-  .prem-text{font-size:13px;color:var(--text2);text-align:center}
-  .prem-text strong{color:var(--warn)}
-
   footer{border-top:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;color:var(--text3);font-size:12px;font-family:'IBM Plex Mono',monospace;margin-top:32px}
 
-  @media(max-width:900px){.kpi-row{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}}
+  @media(max-width:900px){.kpi-row,.grid-2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -137,8 +125,10 @@
 </div>
 
 <div class="main">
+
   <div class="breadcrumb">Şirketler <span>/</span> Rafineryciler <span>/</span> <span>TUPRS</span></div>
 
+  <!-- COMPANY HEADER -->
   <div class="company-header">
     <div class="company-info">
       <div class="company-logo">TÜPRAŞ</div>
@@ -151,73 +141,63 @@
       </div>
     </div>
     <div class="price-block">
-      <div class="price-main" id="tuprs-price" style="color:var(--green)">₺—</div>
-      <div class="price-change" id="tuprs-change" style="color:var(--text3);font-size:12px;">yükleniyor...</div>
-      <div class="price-time" id="tuprs-time">Borsa İstanbul</div>
+      <div class="price-main" id="tuprs-header-price" style="color:var(--green)">₺—</div>
+      <div class="price-change" id="tuprs-header-change" style="color:var(--text3);font-size:12px;">yükleniyor...</div>
+      <div class="price-time" id="tuprs-header-time">Borsa İstanbul · Haftalık</div>
     </div>
   </div>
 
-  <div class="tabs">
-    <div class="tab active" id="tab-btn-0">Öncü Göstergeler</div>
-    <div class="tab" id="tab-btn-1">Finansallar</div>
-    <div class="tab" id="tab-btn-2">Rafineri Marjları</div>
-    <div class="tab" id="tab-btn-3">Notlar &amp; Analizler</div>
-  </div>
-
-  <!-- TAB 0: ÖNCÜ GÖSTERGELER -->
-  <div id="tab-0">
-    <div class="section-title">Anlık Fiyat Göstergeleri <span id="update-time" style="font-size:10px;font-weight:400;color:var(--text3);letter-spacing:0;text-transform:none;font-family:'IBM Plex Mono',monospace;"></span></div>
-    <div class="kpi-row">
-      <div class="kpi-card c-green fade-in">
-        <div class="kpi-top"><div class="kpi-label">TÜPRAŞ Hisse Fiyatı</div><span class="kpi-ticker kt-green">TUPRS</span></div>
-        <div class="kpi-value" id="kpi-tuprs-price" style="color:var(--green)">₺—</div>
-        <div class="kpi-sub" id="kpi-tuprs-change"><span class="kpi-badge" style="background:var(--surface2);color:var(--text3);">yükleniyor...</span></div>
-        <div class="kpi-foot">Borsa İstanbul · Yahoo Finance</div>
-      </div>
-      <div class="kpi-card c-blue fade-in">
-        <div class="kpi-top"><div class="kpi-label">Brent Ham Petrol</div><span class="kpi-ticker kt-blue">LCO</span></div>
-        <div class="kpi-value" id="kpi-brent-price">$—</div>
-        <div class="kpi-sub" id="kpi-brent-change"><span class="kpi-badge" style="background:var(--surface2);color:var(--text3);">yükleniyor...</span></div>
-        <div class="kpi-foot">Maliyet kalemi · ICE Futures</div>
-      </div>
+  <!-- KPI KARTLARI -->
+  <div class="section-title">Öncü Göstergeler <span id="update-time" style="font-size:10px;font-weight:400;color:var(--text3);letter-spacing:0;text-transform:none;font-family:'IBM Plex Mono',monospace;"></span></div>
+  <div class="kpi-row">
+    <div class="kpi-card c-green fade-in">
+      <div class="kpi-top"><div class="kpi-label">TÜPRAŞ Hisse Fiyatı</div><span class="kpi-ticker kt-green">TUPRS</span></div>
+      <div class="kpi-value" id="kpi-tuprs" style="color:var(--green)">₺—</div>
+      <div class="kpi-sub" id="kpi-tuprs-sub"><span class="kpi-badge" style="background:var(--surface2);color:var(--text3);">yükleniyor...</span></div>
+      <div class="kpi-foot" id="kpi-tuprs-date">Borsa İstanbul · Haftalık veri</div>
     </div>
-
-    <div class="section-title">Fiyat Grafikleri</div>
-    <div class="grid-2">
-      <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title">TÜPRAŞ Hisse <span class="ctag ct-green">TUPRS</span><span class="src">· Borsa İstanbul</span></div>
-          <div class="update-badge"><span class="live-dot"></span> Günlük</div>
-        </div>
-        <div class="chart-body"><canvas id="tuprsChart"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title">Brent Ham Petrol <span class="ctag ct-blue">LCO</span><span class="src">· ICE Futures</span></div>
-          <div class="update-badge"><span class="live-dot"></span> Günlük</div>
-        </div>
-        <div class="chart-body"><canvas id="brentChart"></canvas></div>
-      </div>
+    <div class="kpi-card c-blue fade-in">
+      <div class="kpi-top"><div class="kpi-label">Brent Ham Petrol</div><span class="kpi-ticker kt-blue">LCO</span></div>
+      <div class="kpi-value" id="kpi-lco">$—</div>
+      <div class="kpi-sub" id="kpi-lco-sub"><span class="kpi-badge" style="background:var(--surface2);color:var(--text3);">yükleniyor...</span></div>
+      <div class="kpi-foot" id="kpi-lco-date">ICE Futures · Haftalık veri</div>
     </div>
   </div>
 
-  <!-- TAB 2: RAFİNERİ MARJLARI -->
-  <div id="tab-2" style="display:none;">
-    <div class="section-title">Motorin Marjı Karşılaştırması <span style="font-size:10px;font-weight:400;color:var(--text3);letter-spacing:0;text-transform:none;font-family:'IBM Plex Mono',monospace;">· Google Sheet · Aylık</span></div>
+  <!-- FİYAT GRAFİKLERİ -->
+  <div class="section-title">Fiyat Grafikleri</div>
+  <div class="grid-2">
     <div class="chart-card">
       <div class="chart-header">
-        <div class="chart-title">TÜPRAŞ vs Avrupa Motorin Marjı <span class="ctag ct-teal">$/ton</span></div>
-        <div class="update-badge"><span style="width:7px;height:7px;background:var(--green);border-radius:50%;display:inline-block;"></span> Aylık · KAP</div>
+        <div class="chart-title">TÜPRAŞ Hisse Fiyatı <span class="ctag ct-green">TUPRS</span><span class="src">· Borsa İstanbul</span></div>
+        <div class="update-badge"><span class="live-dot"></span> Haftalık</div>
       </div>
-      <div class="chart-body">
-        <div class="marj-legend">
-          <div class="legend-item"><span class="legend-line" style="background:#3b82f6;"></span>2025 TÜPRAŞ Motorin</div>
-          <div class="legend-item"><span class="legend-line" style="background:#ef4444;"></span>2025 Avrupa Motorin</div>
-          <div class="legend-item"><span class="legend-line" style="background:#f59e0b;border:2px solid #f59e0b;"></span>2026 TÜPRAŞ Motorin</div>
-          <div class="legend-item"><span class="legend-line" style="background:#10b981;border:2px solid #10b981;"></span>2026 Avrupa Motorin</div>
-        </div>
-        <canvas id="marjChart" style="max-height:400px;"></canvas>
+      <div class="chart-body"><canvas id="tuprsChart" style="max-height:260px;"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Brent Ham Petrol <span class="ctag ct-blue">LCO</span><span class="src">· ICE Futures</span></div>
+        <div class="update-badge"><span class="live-dot"></span> Haftalık</div>
       </div>
+      <div class="chart-body"><canvas id="brentChart" style="max-height:260px;"></canvas></div>
+    </div>
+  </div>
+
+  <!-- MOTORİN MARJ GRAFİĞİ -->
+  <div class="section-title">Rafineri Marj Grafikleri</div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div class="chart-title">TÜPRAŞ vs Avrupa Motorin Marjı <span class="ctag ct-teal">$/ton</span></div>
+      <div class="update-badge"><span style="width:7px;height:7px;background:var(--green);border-radius:50%;display:inline-block;"></span> Aylık · KAP</div>
+    </div>
+    <div class="chart-body">
+      <div class="marj-legend">
+        <div class="legend-item"><span class="legend-line" style="background:#3b82f6;"></span>2025 TÜPRAŞ Motorin</div>
+        <div class="legend-item"><span class="legend-line" style="background:#ef4444;"></span>2025 Avrupa Motorin</div>
+        <div class="legend-item"><span class="legend-line" style="background:#f59e0b;"></span>2026 TÜPRAŞ Motorin</div>
+        <div class="legend-item"><span class="legend-line" style="background:#10b981;"></span>2026 Avrupa Motorin</div>
+      </div>
+      <canvas id="marjChart" style="max-height:400px;"></canvas>
     </div>
   </div>
 
@@ -236,7 +216,7 @@
 
   const tip = {backgroundColor:'#181c22',borderColor:'#2a3140',borderWidth:1,padding:10,titleColor:'#e8edf5',bodyColor:'#8892a4'};
 
-  function mkGrad(ctx, hex, a=.18) {
+  function mkGrad(ctx, hex, a=.15) {
     const g = ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height);
     g.addColorStop(0, hex+Math.round(a*255).toString(16).padStart(2,'0'));
     g.addColorStop(1, hex+'03');
@@ -249,88 +229,97 @@
       interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:false},tooltip:{...tip,callbacks:{label:c=>'  '+fmt(c.parsed.y)}}},
       scales:{
-        x:{grid:{color:'rgba(31,37,48,.6)'},ticks:{maxTicksLimit:7}},
+        x:{grid:{color:'rgba(31,37,48,.6)'},ticks:{maxTicksLimit:8}},
         y:{grid:{color:'rgba(31,37,48,.6)'},ticks:{maxTicksLimit:5,callback:fmt}}
       },
-      elements:{point:{radius:0,hoverRadius:5},line:{tension:.35,borderWidth:2}}
+      elements:{point:{radius:3,hoverRadius:6},line:{tension:.35,borderWidth:2}}
     };
   }
 
-  // Simüle veri — gerçek veri yüklenince değiştirilir
-  function genData(base, vol, n, trend=0) {
-    const d=[]; let v=base;
-    for(let i=0;i<n;i++){v+=(Math.random()-.48)*vol+trend;v=Math.max(base*.72,Math.min(base*1.3,v));d.push(parseFloat(v.toFixed(2)));}
-    return d;
-  }
-  function dayLabels(n){const out=[],now=new Date();for(let i=n-1;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);out.push(d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short'}));}return out;}
-
-  const L = dayLabels(90);
-
-  window._tuprsChart = new Chart(document.getElementById('tuprsChart'),{
+  // Boş grafikler — veri yüklenince doldurulacak
+  window._tuprsChart = new Chart(document.getElementById('tuprsChart'), {
     type:'line',
-    data:{labels:L,datasets:[{data:genData(185,8,90,.05),borderColor:'#00d4a8',backgroundColor:ctx=>mkGrad(ctx,'#00d4a8'),fill:true,label:'TUPRS'}]},
-    options:lineOpts(v=>'₺'+v.toFixed(2))
+    data:{labels:[],datasets:[{data:[],borderColor:'#00d4a8',backgroundColor:ctx=>mkGrad(ctx,'#00d4a8'),fill:true,label:'TUPRS'}]},
+    options:lineOpts(v=>'₺'+v.toFixed(0))
   });
 
-  window._brentChart = new Chart(document.getElementById('brentChart'),{
+  window._brentChart = new Chart(document.getElementById('brentChart'), {
     type:'line',
-    data:{labels:L,datasets:[{data:genData(82,2,90,.03),borderColor:'#3b82f6',backgroundColor:ctx=>mkGrad(ctx,'#3b82f6'),fill:true,label:'Brent'}]},
-    options:lineOpts()
+    data:{labels:[],datasets:[{data:[],borderColor:'#3b82f6',backgroundColor:ctx=>mkGrad(ctx,'#3b82f6'),fill:true,label:'Brent'}]},
+    options:lineOpts(v=>'$'+v.toFixed(2))
   });
 
-  // ── CANLI VERİ ──
+  // ── VERİ YükLE ──
   async function loadData() {
     try {
       const r = await fetch('/api/prices');
       const j = await r.json();
-      if (!j.success) return;
+      if (!j.success) { console.error('API hatası:', j.error); return; }
 
-      // Güncelleme zamanı
       const t = new Date(j.updatedAt);
       document.getElementById('update-time').textContent =
         '· ' + t.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}) + ' güncellendi';
 
-      // TÜPRAŞ fiyatı
-      if (j.tuprs && !j.tuprs.error) {
+      // ── TÜPRAŞ ──
+      if (j.tuprs && j.tuprs.price) {
         const up = j.tuprs.changePct >= 0;
         const col = up ? 'var(--green)' : 'var(--red)';
-        document.getElementById('tuprs-price').textContent = '₺' + j.tuprs.price.toFixed(2);
-        document.getElementById('tuprs-price').style.color = col;
-        document.getElementById('tuprs-change').textContent =
-          (up?'▲ +':'▼ ') + j.tuprs.change.toFixed(2) + ' (' + (up?'+':'') + j.tuprs.changePct.toFixed(2) + '%)';
-        document.getElementById('tuprs-change').style.color = col;
-        document.getElementById('tuprs-time').textContent = 'Son güncelleme: ' + t.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}) + ' · Borsa İstanbul';
-        // KPI
-        document.getElementById('kpi-tuprs-price').textContent = '₺' + j.tuprs.price.toFixed(2);
-        document.getElementById('kpi-tuprs-price').style.color = col;
-        document.getElementById('kpi-tuprs-change').innerHTML =
-          `<span class="kpi-badge ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(j.tuprs.changePct).toFixed(2)}%</span><span>₺ · bugün</span>`;
+        const priceTxt = '₺' + j.tuprs.price.toFixed(1);
+        const changeTxt = (up?'▲ +':'▼ ') + j.tuprs.change.toFixed(1) + ' (' + (up?'+':'') + j.tuprs.changePct.toFixed(2) + '%)';
+
+        document.getElementById('tuprs-header-price').textContent = priceTxt;
+        document.getElementById('tuprs-header-price').style.color = col;
+        document.getElementById('tuprs-header-change').textContent = changeTxt;
+        document.getElementById('tuprs-header-change').style.color = col;
+        document.getElementById('tuprs-header-time').textContent = 'Haftalık · ' + (j.tuprs.date || '');
+
+        document.getElementById('kpi-tuprs').textContent = priceTxt;
+        document.getElementById('kpi-tuprs').style.color = col;
+        document.getElementById('kpi-tuprs-sub').innerHTML =
+          `<span class="kpi-badge ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(j.tuprs.changePct).toFixed(2)}%</span><span>₺ · haftalık değişim</span>`;
+        document.getElementById('kpi-tuprs-date').textContent = 'Son veri: ' + (j.tuprs.date || '');
       }
 
-      // Brent fiyatı
-      if (j.brent && !j.brent.error) {
-        const up = j.brent.changePct >= 0;
-        document.getElementById('kpi-brent-price').textContent = '$' + j.brent.price.toFixed(2);
-        document.getElementById('kpi-brent-change').innerHTML =
-          `<span class="kpi-badge ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(j.brent.changePct).toFixed(2)}%</span><span>$/varil · bugün</span>`;
+      // ── BRENT ──
+      if (j.lco && j.lco.price) {
+        const up = j.lco.changePct >= 0;
+        document.getElementById('kpi-lco').textContent = '$' + j.lco.price.toFixed(2);
+        document.getElementById('kpi-lco-sub').innerHTML =
+          `<span class="kpi-badge ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(j.lco.changePct).toFixed(2)}%</span><span>$/varil · haftalık değişim</span>`;
+        document.getElementById('kpi-lco-date').textContent = 'Son veri: ' + (j.lco.date || '');
       }
 
-      // Marj grafiği
+      // ── FİYAT GRAFİKLERİ ──
+      if (j.chart && j.chart.length > 0) {
+        const labels = j.chart.map(r => r.date);
+        const tuprsD = j.chart.map(r => r.tuprs);
+        const lcoD   = j.chart.map(r => r.lco);
+
+        window._tuprsChart.data.labels = labels;
+        window._tuprsChart.data.datasets[0].data = tuprsD;
+        window._tuprsChart.update();
+
+        window._brentChart.data.labels = labels;
+        window._brentChart.data.datasets[0].data = lcoD;
+        window._brentChart.update();
+      }
+
+      // ── MARJ GRAFİĞİ ──
       if (j.marjChart && j.marjChart.labels && j.marjChart.labels.length > 0) {
         const mc = j.marjChart;
         if (window._marjChart) window._marjChart.destroy();
         window._marjChart = new Chart(document.getElementById('marjChart'), {
-          type: 'line',
-          data: {
+          type:'line',
+          data:{
             labels: mc.labels,
-            datasets: [
-              { label:'2025 TÜPRAŞ Motorin', data:mc.tuprs2025,  borderColor:'#3b82f6', fill:false, tension:.3, borderWidth:2, pointRadius:4, spanGaps:true },
-              { label:'2025 Avrupa Motorin',  data:mc.avrupa2025, borderColor:'#ef4444', fill:false, tension:.3, borderWidth:2, pointRadius:4, spanGaps:true },
-              { label:'2026 TÜPRAŞ Motorin', data:mc.tuprs2026,  borderColor:'#f59e0b', fill:false, tension:.3, borderWidth:2.5, pointRadius:4, spanGaps:true },
-              { label:'2026 Avrupa Motorin',  data:mc.avrupa2026, borderColor:'#10b981', fill:false, tension:.3, borderWidth:2.5, pointRadius:4, spanGaps:true },
+            datasets:[
+              {label:'2025 TÜPRAŞ Motorin', data:mc.tuprs2025,  borderColor:'#3b82f6', fill:false, tension:.3, borderWidth:2,   pointRadius:4, spanGaps:true},
+              {label:'2025 Avrupa Motorin',  data:mc.avrupa2025, borderColor:'#ef4444', fill:false, tension:.3, borderWidth:2,   pointRadius:4, spanGaps:true},
+              {label:'2026 TÜPRAŞ Motorin', data:mc.tuprs2026,  borderColor:'#f59e0b', fill:false, tension:.3, borderWidth:2.5, pointRadius:4, spanGaps:true},
+              {label:'2026 Avrupa Motorin',  data:mc.avrupa2026, borderColor:'#10b981', fill:false, tension:.3, borderWidth:2.5, pointRadius:4, spanGaps:true},
             ]
           },
-          options: {
+          options:{
             responsive:true, maintainAspectRatio:true,
             interaction:{mode:'index',intersect:false},
             plugins:{
@@ -351,19 +340,6 @@
 
   loadData();
 
-  // Tab geçişleri
-  document.querySelectorAll('.tab').forEach((tab, i) => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      [0,2].forEach(n => {
-        const el = document.getElementById('tab-'+n);
-        if (el) el.style.display = (n===i) ? '' : 'none';
-      });
-    });
-  });
-
-  // Nav
   document.querySelectorAll('.nav a').forEach(a => {
     a.addEventListener('click', () => {
       document.querySelectorAll('.nav a').forEach(x => x.classList.remove('active'));
