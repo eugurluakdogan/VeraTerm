@@ -85,15 +85,30 @@ module.exports = async function handler(req, res) {
     const months = ['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'];
 
     const marjRows = rows.filter(r => {
-      const ay = (r[1] || '').trim().toUpperCase();
-      return months.includes(ay);
-    }).map(r => ({
-      ay:         r[1].trim(),
-      tuprs2025:  parseNum(r[2]),
-      avrupa2025: parseNum(r[3]),
-      tuprs2026:  parseNum(r[4]),
-      avrupa2026: parseNum(r[5]),
-    }));
+      const a = (r[0] || '').trim().toUpperCase();
+      const b = (r[1] || '').trim().toUpperCase();
+      return months.includes(a) || months.includes(b);
+    }).map(r => {
+      // Ay ismi A'da mı B'de mi?
+      const ayInA = months.includes((r[0] || '').trim().toUpperCase());
+      if (ayInA) {
+        return {
+          ay:         r[0].trim(),
+          tuprs2025:  parseNum(r[1]),
+          avrupa2025: parseNum(r[2]),
+          tuprs2026:  parseNum(r[3]),
+          avrupa2026: parseNum(r[4]),
+        };
+      } else {
+        return {
+          ay:         r[1].trim(),
+          tuprs2025:  parseNum(r[2]),
+          avrupa2025: parseNum(r[3]),
+          tuprs2026:  parseNum(r[4]),
+          avrupa2026: parseNum(r[5]),
+        };
+      }
+    });
 
     res.status(200).json({
       success:   true,
