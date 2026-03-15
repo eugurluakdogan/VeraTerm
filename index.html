@@ -147,8 +147,26 @@
     </div>
   </div>
 
+  <!-- MOTORİN MARJ GRAFİĞİ — ÜSTTE -->
+  <div class="section-title">Rafineri Marj Grafikleri</div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div class="chart-title">TÜPRAŞ vs Avrupa Motorin Marjı <span class="ctag ct-teal">$/ton</span></div>
+      <div class="update-badge"><span style="width:7px;height:7px;background:var(--green);border-radius:50%;display:inline-block;"></span> Aylık · KAP</div>
+    </div>
+    <div class="chart-body">
+      <div class="marj-legend">
+        <div class="legend-item"><span class="legend-line" style="background:#3b82f6;"></span>2025 TÜPRAŞ Motorin</div>
+        <div class="legend-item"><span class="legend-line" style="background:#ef4444;"></span>2025 Avrupa Motorin</div>
+        <div class="legend-item"><span class="legend-line" style="background:#f59e0b;"></span>2026 TÜPRAŞ Motorin</div>
+        <div class="legend-item"><span class="legend-line" style="background:#10b981;"></span>2026 Avrupa Motorin</div>
+      </div>
+      <canvas id="marjChart" style="max-height:400px;"></canvas>
+    </div>
+  </div>
+
   <!-- KPI KARTLARI -->
-  <div class="section-title">Öncü Göstergeler <span id="update-time" style="font-size:10px;font-weight:400;color:var(--text3);letter-spacing:0;text-transform:none;font-family:'IBM Plex Mono',monospace;"></span></div>
+  <div class="section-title">Anlık Fiyat Göstergeleri <span id="update-time" style="font-size:10px;font-weight:400;color:var(--text3);letter-spacing:0;text-transform:none;font-family:'IBM Plex Mono',monospace;"></span></div>
   <div class="kpi-row">
     <div class="kpi-card c-green fade-in">
       <div class="kpi-top"><div class="kpi-label">TÜPRAŞ Hisse Fiyatı</div><span class="kpi-ticker kt-green">TUPRS</span></div>
@@ -164,7 +182,7 @@
     </div>
   </div>
 
-  <!-- FİYAT GRAFİKLERİ -->
+  <!-- FİYAT GRAFİKLERİ — ALTTA -->
   <div class="section-title">Fiyat Grafikleri</div>
   <div class="grid-2">
     <div class="chart-card">
@@ -180,24 +198,6 @@
         <div class="update-badge"><span class="live-dot"></span> Haftalık</div>
       </div>
       <div class="chart-body"><canvas id="brentChart" style="max-height:260px;"></canvas></div>
-    </div>
-  </div>
-
-  <!-- MOTORİN MARJ GRAFİĞİ -->
-  <div class="section-title">Rafineri Marj Grafikleri</div>
-  <div class="chart-card">
-    <div class="chart-header">
-      <div class="chart-title">TÜPRAŞ vs Avrupa Motorin Marjı <span class="ctag ct-teal">$/ton</span></div>
-      <div class="update-badge"><span style="width:7px;height:7px;background:var(--green);border-radius:50%;display:inline-block;"></span> Aylık · KAP</div>
-    </div>
-    <div class="chart-body">
-      <div class="marj-legend">
-        <div class="legend-item"><span class="legend-line" style="background:#3b82f6;"></span>2025 TÜPRAŞ Motorin</div>
-        <div class="legend-item"><span class="legend-line" style="background:#ef4444;"></span>2025 Avrupa Motorin</div>
-        <div class="legend-item"><span class="legend-line" style="background:#f59e0b;"></span>2026 TÜPRAŞ Motorin</div>
-        <div class="legend-item"><span class="legend-line" style="background:#10b981;"></span>2026 Avrupa Motorin</div>
-      </div>
-      <canvas id="marjChart" style="max-height:400px;"></canvas>
     </div>
   </div>
 
