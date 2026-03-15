@@ -82,33 +82,19 @@ module.exports = async function handler(req, res) {
     })).filter(r => r.date && r.lco);
 
     // ── MARJ VERİSİ: ay isimlerini bul ──
-    const months = ['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'];
+    // Marj satırları: ilk 12 satır (başlık satırından sonra)
+    // CSV'de B sütunu boş, ay isimleri positional olarak atanıyor
+    const AYLAR = ['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'];
 
-    const marjRows = rows.filter(r => {
-      const a = (r[0] || '').trim().toUpperCase();
-      const b = (r[1] || '').trim().toUpperCase();
-      return months.includes(a) || months.includes(b);
-    }).map(r => {
-      // Ay ismi A'da mı B'de mi?
-      const ayInA = months.includes((r[0] || '').trim().toUpperCase());
-      if (ayInA) {
-        return {
-          ay:         r[0].trim(),
-          tuprs2025:  parseNum(r[1]),
-          avrupa2025: parseNum(r[2]),
-          tuprs2026:  parseNum(r[3]),
-          avrupa2026: parseNum(r[4]),
-        };
-      } else {
-        return {
-          ay:         r[1].trim(),
-          tuprs2025:  parseNum(r[2]),
-          avrupa2025: parseNum(r[3]),
-          tuprs2026:  parseNum(r[4]),
-          avrupa2026: parseNum(r[5]),
-        };
-      }
-    });
+    // İlk satır başlık (2025/2026), ikinci satır da başlık (Tüpraş Motorin / GZ1)
+    // 3. satırdan itibaren 12 ay verisi — A ve B boş, C=tuprs2025, D=avrupa2025, E=tuprs2026, F=avrupa2026
+    const marjRows = rows.slice(2, 14).map((r, i) => ({
+      ay:         AYLAR[i],
+      tuprs2025:  parseNum(r[2]),
+      avrupa2025: parseNum(r[3]),
+      tuprs2026:  parseNum(r[4]),
+      avrupa2026: parseNum(r[5]),
+    })).filter(r => r.tuprs2025 || r.avrupa2025 || r.tuprs2026 || r.avrupa2026);
 
     res.status(200).json({
       success:   true,
